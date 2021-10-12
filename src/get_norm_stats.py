@@ -13,11 +13,14 @@ import numpy as np
 from src import dataloader
 
 # set skip_norm as True only when you are computing the normalization stats
-audio_conf = {'num_mel_bins': 128, 'target_length': 1024, 'freqm': 24, 'timem': 192, 'mixup': 0.5, 'skip_norm': True, 'mode': 'train', 'dataset': 'audioset'}
+audio_conf = {'num_mel_bins': 128, 'target_length': 398, 'freqm': 48, 'timem': 128, 'mixup': 0.5, 'skip_norm': True, 'mode': 'train', 'dataset': 'yandexcommands'}
+
+train_data_path = '/home/es_egor_sergeenko/ast/egs/yandexcommands/data/datafiles/train_data.json'
+labels_path = '/home/es_egor_sergeenko/ast/egs/yandexcommands/data/class_labels_indices.csv'
 
 train_loader = torch.utils.data.DataLoader(
-    dataloader.AudiosetDataset('/data/sls/scratch/yuangong/audioset/datafiles/balanced_train_data.json', label_csv='/data/sls/scratch/yuangong/audioset/utilities/class_labels_indices.csv',
-                                audio_conf=audio_conf), batch_size=1000, shuffle=False, num_workers=8, pin_memory=True)
+    dataloader.AudiosetDataset(train_data_path, label_csv=labels_path,
+                                audio_conf=audio_conf), batch_size=128, shuffle=False, num_workers=8, pin_memory=True)
 mean=[]
 std=[]
 for i, (audio_input, labels) in enumerate(train_loader):

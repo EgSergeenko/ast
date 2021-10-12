@@ -76,8 +76,12 @@ def train(audio_model, train_loader, test_loader, args):
         main_metrics = 'acc'
         loss_fn = nn.BCEWithLogitsLoss()
         warmup = False
-    else:
-        raise ValueError('unknown dataset, dataset should be in [audioset, speechcommands, esc50]')
+    elif args.dataset == 'yandexcommands':
+        print('scheduler for yandex commands is used')
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, list(range(5, 26)), gamma=0.85)
+        main_metrics = 'acc'
+        loss_fn = nn.BCEWithLogitsLoss()
+        warmup = False
     print('now training with {:s}, main metrics: {:s}, loss function: {:s}, learning rate scheduler: {:s}'.format(str(args.dataset), str(main_metrics), str(loss_fn), str(scheduler)))
     args.loss_fn = loss_fn
 
