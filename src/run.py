@@ -62,14 +62,14 @@ parser.add_argument('--audioset_pretrain',
 
 args = parser.parse_args()
 
-num_workers = 8
+num_workers = 2
 
 # transformer based model
 if args.model == 'ast':
     print('now train a audio spectrogram transformer model')
     # dataset spectrogram mean and std, used to normalize the input
     norm_stats = {'audioset': [-4.2677393, 4.5689974], 'esc50': [-6.6268077, 5.358466],
-                  'speechcommands': [-6.845978, 5.5654526], 'yandexcommands': [0, 0]}
+                  'speechcommands': [-6.845978, 5.5654526], 'yandexcommands': [-6.134471, 6.480528]}
     target_length = {'audioset': 1024, 'esc50': 512, 'speechcommands': 128, 'yandexcommands': 398}
     # if add noise for data augmentation, only use for speech commands
     noise = {'audioset': False, 'esc50': False, 'speechcommands': True, 'yandexcommands': False}
@@ -98,11 +98,11 @@ if args.model == 'ast':
 
     val_loader = torch.utils.data.DataLoader(
         dataloader.AudiosetDataset(args.data_val, label_csv=args.label_csv, audio_conf=val_audio_conf),
-        batch_size=args.batch_size * 2, shuffle=False, num_workers=num_workers, pin_memory=True)
+        batch_size=args.batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
 
     audio_model = models.ASTModel(label_dim=args.n_class, fstride=args.fstride, tstride=args.tstride, input_fdim=128,
                                   input_tdim=target_length[args.dataset], imagenet_pretrain=args.imagenet_pretrain,
-                                  audioset_pretrain=args.audioset_pretrain, model_size='base384')
+                                  audioset_pretrain=args.audioset_pretrain, model_size='small224')
 
 print("\nCreating experiment directory: %s" % args.exp_dir)
 os.makedirs("%s/models" % args.exp_dir)

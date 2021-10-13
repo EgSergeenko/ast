@@ -9,6 +9,10 @@
 
 import torch
 import numpy as np
+import sys
+import os
+
+sys.path.append('/home/es_egor_sergeenko/ast')
 
 from src import dataloader
 
@@ -20,7 +24,7 @@ labels_path = '/home/es_egor_sergeenko/ast/egs/yandexcommands/data/class_labels_
 
 train_loader = torch.utils.data.DataLoader(
     dataloader.AudiosetDataset(train_data_path, label_csv=labels_path,
-                                audio_conf=audio_conf), batch_size=128, shuffle=False, num_workers=8, pin_memory=True)
+                                audio_conf=audio_conf), batch_size=128, shuffle=False, num_workers=2, pin_memory=True)
 mean=[]
 std=[]
 for i, (audio_input, labels) in enumerate(train_loader):

@@ -20,12 +20,12 @@ dataset=yandexcommands
 imagenetpretrain=True
 audiosetpretrain=False
 bal=none
-lr=2.5e-4
+lr=0.001
 epoch=30
 freqm=48
-timem=128
+timem=48
 mixup=0.5
-batch_size=128
+batch_size=56
 fstride=10
 tstride=10
 tr_data=/home/es_egor_sergeenko/ast/egs/yandexcommands/data/datafiles/train_data.json
@@ -46,4 +46,4 @@ CUDA_CACHE_DISABLE=1 python -W ignore /home/es_egor_sergeenko/ast/src/run.py --m
 --label-csv ${label_csv} --n_class ${n_class} \
 --lr $lr --n-epochs ${epoch} --batch-size $batch_size --save_model True \
 --freqm $freqm --timem $timem --mixup ${mixup} --bal ${bal} \
---tstride $tstride --fstride $fstride --imagenet_pretrain $imagenetpretrain --audioset_pretrain $audiosetpretrain > $exp_dir/log.txt
+--tstride $tstride --fstride $fstride --imagenet_pretrain $imagenetpretrain --audioset_pretrain $audiosetpretrain

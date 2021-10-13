@@ -129,7 +129,7 @@ class ASTModel(nn.Module):
             audio_model.load_state_dict(sd, strict=False)
             self.v = audio_model.module.v
             self.original_embedding_dim = self.v.pos_embed.shape[2]
-            self.mlp_head = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim)).to(device)
+            self.mlp_head = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim))
 
             f_dim, t_dim = self.get_shape(fstride, tstride, input_fdim, input_tdim)
             num_patches = f_dim * t_dim
