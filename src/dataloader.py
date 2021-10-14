@@ -112,7 +112,8 @@ class AudiosetDataset(Dataset):
         if filename2 == None:
             idx = np.random.randint(0, len(self._noise))
             waveform, sr = torchaudio.load(filename)
-            waveform = self._add_noise(waveform, self.noises[idx])
+            if self.noise:
+                waveform = self._add_noise(waveform, self.noises[idx])
             waveform = waveform - waveform.mean()
         # mixup
         else:
