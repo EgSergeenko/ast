@@ -23,7 +23,7 @@ train_data_path = '/home/es_egor_sergeenko/ast/egs/yandexcommands/data/datafiles
 labels_path = '/home/es_egor_sergeenko/ast/egs/yandexcommands/data/class_labels_indices.csv'
 
 train_loader = torch.utils.data.DataLoader(
-    dataloader.AudiosetDataset(train_data_path, label_csv=labels_path,
+    dataloader.AudiosetDataset(train_data_path, None, label_csv=labels_path,
                                 audio_conf=audio_conf), batch_size=128, shuffle=False, num_workers=2, pin_memory=True)
 mean=[]
 std=[]
