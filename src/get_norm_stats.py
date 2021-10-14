@@ -17,7 +17,7 @@ sys.path.append('/home/es_egor_sergeenko/ast')
 from src import dataloader
 
 # set skip_norm as True only when you are computing the normalization stats
-audio_conf = {'num_mel_bins': 128, 'target_length': 398, 'freqm': 48, 'timem': 128, 'mixup': 0.5, 'skip_norm': True, 'mode': 'train', 'dataset': 'yandexcommands'}
+audio_conf = {'num_mel_bins': 128, 'target_length': 398, 'freqm': 48, 'timem': 48, 'mixup': 0, 'skip_norm': True, 'mode': 'train', 'dataset': 'yandexcommands'}
 
 train_data_path = '/home/es_egor_sergeenko/ast/egs/yandexcommands/data/datafiles/train_data.json'
 labels_path = '/home/es_egor_sergeenko/ast/egs/yandexcommands/data/class_labels_indices.csv'
