@@ -26,6 +26,7 @@ print("I am process %s, running on %s: starting (%s)" % (os.getpid(), os.uname()
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("--data-train", type=str, default='', help="training data json")
 parser.add_argument("--data-val", type=str, default='', help="validation data json")
+parser.add_argument("--data-noise", type=str, default='', help="noise data json")
 parser.add_argument("--data-eval", type=str, default='', help="evaluation data json")
 parser.add_argument("--label-csv", type=str, default='', help="csv with class labels")
 parser.add_argument("--n_class", type=int, default=527, help="number of classes")
@@ -72,7 +73,7 @@ if args.model == 'ast':
                   'speechcommands': [-6.845978, 5.5654526], 'yandexcommands': [-6.134471, 6.480528]}
     target_length = {'audioset': 1024, 'esc50': 512, 'speechcommands': 128, 'yandexcommands': 398}
     # if add noise for data augmentation, only use for speech commands
-    noise = {'audioset': False, 'esc50': False, 'speechcommands': True, 'yandexcommands': False}
+    noise = {'audioset': False, 'esc50': False, 'speechcommands': True, 'yandexcommands': True}
 
     audio_conf = {'num_mel_bins': 128, 'target_length': target_length[args.dataset], 'freqm': args.freqm,
                   'timem': args.timem, 'mixup': args.mixup, 'dataset': args.dataset, 'mode': 'train',
@@ -80,7 +81,7 @@ if args.model == 'ast':
                   'noise': noise[args.dataset]}
     val_audio_conf = {'num_mel_bins': 128, 'target_length': target_length[args.dataset], 'freqm': 0, 'timem': 0,
                       'mixup': 0, 'dataset': args.dataset, 'mode': 'evaluation', 'mean': norm_stats[args.dataset][0],
-                      'std': norm_stats[args.dataset][1], 'noise': False}
+                      'std': norm_stats[args.dataset][1], 'noise': noise[args.dataset]}
 
     if args.bal == 'bal':
         print('balanced sampler is being used')
@@ -88,16 +89,16 @@ if args.model == 'ast':
         sampler = WeightedRandomSampler(samples_weight, len(samples_weight), replacement=True)
 
         train_loader = torch.utils.data.DataLoader(
-            dataloader.AudiosetDataset(args.data_train, label_csv=args.label_csv, audio_conf=audio_conf),
+            dataloader.AudiosetDataset(args.data_train, args.data_noise, label_csv=args.label_csv, audio_conf=audio_conf),
             batch_size=args.batch_size, sampler=sampler, num_workers=num_workers, pin_memory=True)
     else:
         print('balanced sampler is not used')
         train_loader = torch.utils.data.DataLoader(
-            dataloader.AudiosetDataset(args.data_train, label_csv=args.label_csv, audio_conf=audio_conf),
+            dataloader.AudiosetDataset(args.data_train, args.data_noise, label_csv=args.label_csv, audio_conf=audio_conf),
             batch_size=args.batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
 
     val_loader = torch.utils.data.DataLoader(
-        dataloader.AudiosetDataset(args.data_val, label_csv=args.label_csv, audio_conf=val_audio_conf),
+        dataloader.AudiosetDataset(args.data_val, args.data_noise, label_csv=args.label_csv, audio_conf=val_audio_conf),
         batch_size=args.batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
 
     audio_model = models.ASTModel(label_dim=args.n_class, fstride=args.fstride, tstride=args.tstride, input_fdim=128,

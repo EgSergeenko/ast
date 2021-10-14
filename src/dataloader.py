@@ -55,7 +55,7 @@ def preemphasis(signal,coeff=0.97):
     return np.append(signal[0],signal[1:]-coeff*signal[:-1])
 
 class AudiosetDataset(Dataset):
-    def __init__(self, dataset_json_file, audio_conf, label_csv=None):
+    def __init__(self, dataset_json_file, noises_json_file, audio_conf, label_csv=None):
         """
         Dataset that manages audio recordings
         :param audio_conf: Dictionary containing the audio loading and preprocessing settings
@@ -90,15 +90,29 @@ class AudiosetDataset(Dataset):
         self.noise = self.audio_conf.get('noise')
         if self.noise == True:
             print('now use noise augmentation')
-
+            self.noises = []
+            with open(noises_json_file, 'r') as fp:
+                data = json.load(fp)['data']
+            for noise_filepath in data:
+                self.noises.append(torchaudio.load(noise_filepath['wav']))
         self.index_dict = make_index_dict(label_csv)
         self.label_num = len(self.index_dict)
         print('number of classes is {:d}'.format(self.label_num))
 
+    def _add_noise(self, clean, noise, min_amp=0.0, max_amp=4.0):
+        noise_amp = np.random.uniform(min_amp, max_amp)
+        noise = noise.repeat(1, clean.shape[1] // noise.shape[1] + 2)
+        start = np.random.randint(0, noise.shape[1] - clean.shape[1] + 1)
+        noise_part = noise[:, start:start+clean.shape[1]]
+        noise_mult = clean.abs().max() / noise_part.abs().max() * noise_amp
+        return (clean + noise_part * noise_mult) / (1 + noise_amp)
+
     def _wav2fbank(self, filename, filename2=None):
         # mixup
         if filename2 == None:
+            idx = np.random.randint(0, len(self._noise))
             waveform, sr = torchaudio.load(filename)
+            waveform = self._add_noise(waveform, self.noises[idx])
             waveform = waveform - waveform.mean()
         # mixup
         else:
@@ -199,10 +213,6 @@ class AudiosetDataset(Dataset):
         # skip normalization the input if you are trying to get the normalization stats.
         else:
             pass
-
-        if self.noise == True:
-            fbank = fbank + torch.rand(fbank.shape[0], fbank.shape[1]) * np.random.rand() / 10
-            fbank = torch.roll(fbank, np.random.randint(-10, 10), 0)
 
         mix_ratio = min(mix_lambda, 1-mix_lambda) / max(mix_lambda, 1-mix_lambda)
 
